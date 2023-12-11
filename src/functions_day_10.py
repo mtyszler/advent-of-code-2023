@@ -117,7 +117,7 @@ def find_continuation_candidates(full_map: list[list[str]], position: (int, int)
     return connections
 
 
-def points_inside(all_nodes: dict, start: (int, int), max_count: int) -> int:
+def points_inside(full_map: list[list[str]], all_nodes: dict, start: (int, int), max_count: int) -> int:
     # order nodes:
     unchecked_nodes = list(set([x for x in all_nodes.keys()]))
     count = 0
@@ -144,14 +144,19 @@ def points_inside(all_nodes: dict, start: (int, int), max_count: int) -> int:
         else:
             candidates = [x for x in all_nodes.keys() if all_nodes[x] == count - 1]
 
+        continuation_candidates = find_continuation_candidates(full_map, current_node,
+                                                               full_map[current_node[0]][current_node[1]])
+
+        continuation_candidates = [x[0] for x in continuation_candidates]
         for this_node in candidates:
-            if (this_node in unchecked_nodes) and \
+            if (this_node in unchecked_nodes) and (this_node in continuation_candidates) and \
                     (
                             (this_node[0] == current_node[0] - 1 and this_node[1] == current_node[1]) or
                             (this_node[0] == current_node[0] + 1 and this_node[1] == current_node[1]) or
                             (this_node[1] == current_node[1] - 1 and this_node[0] == current_node[0]) or
                             (this_node[1] == current_node[1] + 1 and this_node[0] == current_node[0])
                     ):
+
                 unchecked_nodes.remove(this_node)
                 current_node = this_node
                 ordered_nodes.append(current_node)

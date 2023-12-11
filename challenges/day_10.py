@@ -11,6 +11,6 @@ print(max_location)
 print("challenge 2")
 full_map, start = parse_input_file("../input_files/input_day_10.txt")
 max_location, nodes = trace_map(full_map, start)
-n_points_inside = points_inside(nodes, start, max_location)
+n_points_inside = points_inside(full_map, nodes, start, max_location)
 
 print(n_points_inside)
