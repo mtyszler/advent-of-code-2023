@@ -1,76 +1,71 @@
-def parse_input_file(input_file: str) -> list[(int, int)]:
-    """
+def parse_input_file(input_file: str, expansion: int = 1) -> list[(str, list[int])]:
 
-    Args:
-        input_file:
-
-    Returns:
-
-    """
     input_file = open(input_file, 'r')
     lines = input_file.readlines()
 
-    points_in_map = []
+    list_of_records = []
 
-    count_rows = 0
     for this_line in lines:
-        this_line_as_list = [x for x in this_line.strip()]
-        if '#' in this_line_as_list:
-            this_row = count_rows
-            these_col = [idx for idx, val in enumerate(this_line_as_list) if val == '#']
-            for this_col in these_col:
-                points_in_map.append((this_row, this_col))
-        count_rows += 1
+        record, arrangement = this_line.strip().split(" ")
+        list_of_records.append((record * expansion, [int(x) for x in arrangement.split(",")] * expansion))
 
-    return points_in_map
+    return list_of_records
 
 
-def expand_galaxy(points_in_map: list[(int, int)], expansion_factor: int = 1) -> list[(int, int)]:
-    # expand rows:
-    existing_rows = list(set([x[0] for x in points_in_map]))
-    existing_rows.sort()
-    # min_row = min(existing_rows)
-    max_row = max(existing_rows)
+def identify_arrangement(record: str) -> list[int]:
+    arrangement = []
+    this_count = 0
 
-    r = 0
-    while r < max_row:
-        if r not in existing_rows:
-            points_in_map = [(x[0] + expansion_factor, x[1]) if x[0] > r else (x[0], x[1]) for x in points_in_map]
-            existing_rows = list(set([x[0] for x in points_in_map]))
-            existing_rows.sort()
-            max_row = max(existing_rows)
-            r += expansion_factor
-        r += 1
+    for i in range(len(record)):
+        if record[i] == '#':
+            this_count += 1
+        elif record[i] == '.':
+            if this_count > 0:
+                arrangement.append(this_count)
+                this_count = 0
+        elif record[i] == '?':
+            break
 
-    # expand cols:
-    existing_cols = list(set([x[1] for x in points_in_map]))
-    existing_cols.sort()
-    # min_col = min(existing_cols)
-    max_col = max(existing_cols)
+    if this_count > 0:
+        arrangement.append(this_count)
 
-    c = 0
-    while c < max_col:
-        if c not in existing_cols:
-            points_in_map = [(x[0], x[1] + expansion_factor) if x[1] > c else (x[0], x[1]) for x in points_in_map]
-            existing_cols = list(set([x[1] for x in points_in_map]))
-            existing_cols.sort()
-            max_col = max(existing_cols)
-            c += expansion_factor
-        c += 1
-
-    return points_in_map
+    return arrangement
 
 
-def manhattan_adj(a, b):
+def variate_records(record: str, arrangement: list[int], seed: list[str] = []) -> list[str]:
+    # location of the '?'
+    idx = [idx for idx, val in enumerate(record) if val == '?']
 
-    return abs(a[0]-b[0]) + abs(a[1]-b[1])
+    if len(idx) > 0:
+
+        test_record_1 = record
+        test_record_1 = test_record_1[:idx[0]] + '#' + test_record_1[idx[0] + 1:]
+        seed.append(test_record_1)
+
+        test_record_2 = record
+        test_record_2 = test_record_2[:idx[0]] + '.' + test_record_2[idx[0] + 1:]
+        seed.append(test_record_2)
+
+        idx.pop(0)
+
+        if len(idx) > 0:
+            variate_records(test_record_1, arrangement, seed)
+            variate_records(test_record_2, arrangement, seed)
+
+    return seed
 
 
-def all_distances(points_in_map: list[(int, int)]) -> int:
+def solve_row(record: str, arrangement: list[int]) -> list[str]:
+    valid_arrangements = []
+    candidate_arrangements = variate_records(record, arrangement, [])
 
-    total = 0
-    for i in range(len(points_in_map)):
-        for j in range(i, len(points_in_map)):
-            total += manhattan_adj(points_in_map[i], points_in_map[j])
+    for this_arrangement in candidate_arrangements:
 
-    return total
+        # location of the '?'
+        idx = [idx for idx, val in enumerate(this_arrangement) if val == '?']
+
+        if len(idx) == 0:
+            if identify_arrangement(this_arrangement) == arrangement:
+                valid_arrangements.append(this_arrangement)
+
+    return valid_arrangements
