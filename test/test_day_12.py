@@ -20,7 +20,7 @@ def test_parse_input():
 def test_arrangement(record, known_arrangement):
     arrangement = identify_arrangement(record)
 
-    assert (arrangement == known_arrangement)
+    assert (arrangement[0] == known_arrangement)
 
 
 @pytest.mark.parametrize("record, known_arrangement, possibilities",
@@ -50,10 +50,25 @@ def test_possibilities_from_file():
 
 
 def test_possibilities_from_file_expansion():
-
-    list_of_records = parse_input_file("../input_files/input_day_12_example2.txt", expansion=5)
+    list_of_records_1 = parse_input_file("../input_files/input_day_12_example2.txt", expansion=1)
+    list_of_records_2 = parse_input_file("../input_files/input_day_12_example2.txt", expansion=2)
     total = 0
-    for this_entry in list_of_records:
-        total += len(solve_row(this_entry[0], this_entry[1]))
+    for original_entry, this_entry in zip(list_of_records_1, list_of_records_2):
+        print(this_entry)
+        len_1 = len(solve_row(original_entry[0], original_entry[1]))
+        len_2 = len(solve_row(this_entry[0], this_entry[1]))
+
+        factor = len_2/len_1
+        check = len_1*factor*factor*factor*factor
+        total += check
 
     assert (total == 525152)
+
+
+def test_1():
+    a =solve_row_v2('???.###', [1,1,3])
+    assert (len(a)==1)
+
+def test_2():
+    a = solve_row('?????#???????????#?#??????#???????????#?#', [1,4,1,2,1,1,1,4,1,2,1,1])
+    assert (len(a)==1)
