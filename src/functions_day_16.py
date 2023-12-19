@@ -9,7 +9,7 @@ def parse_input_file(input_file: str) -> list[list[str]]:
     return grid
 
 
-def move_light(grid: list[list[str]], test=False) -> list[list[str]]:
+def move_light(grid: list[list[str]], start_pos: (int,int), start_dir: str) -> list[list[str]]:
     # initialize:
     energized_row = ['.'] * len(grid[0])
     energized = []
@@ -19,12 +19,8 @@ def move_light(grid: list[list[str]], test=False) -> list[list[str]]:
     total = 0
     old_total = -99
     repeat = 0
-    if test:
-        rays = [((0, 0), 'r')]
-    else:
-        rays = [((0, 0), 'd')]
+    rays = [(start_pos, start_dir)]
     visited = []
-    energized[0][0] = '#'
     while len(rays) > 0:
         left_the_building = False
         this_ray = rays.pop(0)
