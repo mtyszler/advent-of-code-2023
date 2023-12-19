@@ -15,23 +15,41 @@ def test_parse_input():
 
 def test_parse_input_cycles():
     grid = parse_input_file("../input_files/input_day_14_example.txt")
-
+    checked = [grid]
+    counter = 0
+    repeated = False
     for c in range(1000000000):
 
-        if c % 100 == 0:
-            print(c, 1000000000, c/1000000000*100)
         north = to_north_west(grid)
         grid = move_to_left(north)
 
         west = to_north_west(grid)
         grid = move_to_left(west)
 
-        south = to_north_west(grid)
+        south = to_south(grid)
         grid = move_to_left(south)
 
-        east = to_north_west(grid)
+        east = to_east(grid)
         grid = move_to_left(east)
+        flipped = []
+        for x in grid:
+            x.reverse()
+            flipped.append(x)
+        grid = flipped
+        counter += 1
+        if grid in checked:
+            print("repeat", checked.index(grid))
+            key = checked.index(grid)
+            f_key = (1000000000 - (key + 1)) % (counter - key) + key + 1
+            repeated = True
 
-    load = comp_load(grid)
+        else:
+            checked.append(grid)
+            #        print(counter, comp_load(to_north_west(grid)))
+
+        if repeated:
+            break
+
+    load = comp_load(to_north_west(checked[f_key]))
     assert (load == 64)
 
