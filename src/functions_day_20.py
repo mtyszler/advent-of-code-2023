@@ -56,7 +56,8 @@ def conjunction(memory: dict, sender: str, destinations: list[str], pulse: str) 
         return new_memory, {x: 'high' for x in destinations}
 
 
-def run_pulses(outputs: dict, inputs: dict, types: dict, n_pulses: int) -> dict:
+def run_pulses(outputs: dict, inputs: dict, types: dict, n_pulses: int,
+               target_module: str = '', target_pulse: str = 'low') -> [dict, bool, int]:
     statuses = {x: 'off' for x in types.keys() if types[x] == 'flip-flop'}
     memories = {}
     for x, this_type in types.items():
@@ -65,18 +66,22 @@ def run_pulses(outputs: dict, inputs: dict, types: dict, n_pulses: int) -> dict:
 
     pulses = {'high': 0, 'low': 0}
     for i in range(n_pulses):
-        statuses, memories, pulses = press_button(outputs, inputs, types, statuses, memories, pulses)
+        statuses, memories, pulses = press_button(outputs, inputs, types, statuses, memories, pulses,
+                                                                target_module, target_pulse, counter=i)
 
     return pulses
 
 
-def press_button(outputs: dict, inputs: dict, types: dict, statuses: dict, memories: dict, pulses: dict) -> [dict, dict,
-                                                                                                             dict]:
+def press_button(outputs: dict, inputs: dict, types: dict, statuses: dict, memories: dict, pulses: dict,
+                 target_module: str = '', target_pulse: str = 'low', counter: int = 0) -> [dict, dict, dict]:
     to_do = [('broadcaster', 'low', 'button')]
 
     while len(to_do) > 0:
         this_module, current_pulse, current_sender = to_do.pop(0)
         pulses[current_pulse] += 1
+        if this_module == target_module and current_pulse == target_pulse:
+            print(current_sender, counter+1)
+
         if this_module not in types.keys():
             continue
         if types[this_module] == 'broadcaster':
@@ -96,12 +101,3 @@ def press_button(outputs: dict, inputs: dict, types: dict, statuses: dict, memor
             to_do.extend([(k, v, this_module) for k, v in passes.items()])
 
     return statuses, memories, pulses
-
-
-def retrace_steps(outputs: dict, inputs: dict, types: dict, target: str) -> int:
-
-    inputs_of_target = inputs[target]
-    while len(inputs_of_target) == 1:
-        inputs_of_target = inputs[inputs_of_target[0]]
-
-    return 1
