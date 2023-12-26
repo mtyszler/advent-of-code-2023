@@ -19,9 +19,10 @@ def parse_input(input_file: str) -> [np.ndarray, list[int, int]]:
 
 
 def find_possibilities(grid: np.ndarray, start_location: list[int, int], n_steps: int) -> int:
-    # assuming even steps
-    if n_steps % 2 != 0:
-        raise Exception('function works with even n_steps')
+    if n_steps % 2 == 0:
+        mod_check = 0
+    else:
+        mod_check = 1
 
     to_check = [[start_location, 0, [0, 0]]]
     garden_plots = set()
@@ -42,27 +43,35 @@ def find_possibilities(grid: np.ndarray, start_location: list[int, int], n_steps
         for this_candidate in candidates:
             new_realm = this_realm.copy()
             if this_candidate[0] < 0:
+                #print(this_candidate)
+                continue
                 this_candidate[0] = grid.shape[0] + this_candidate[0]
                 new_realm[0] -= 1
 
             if this_candidate[1] < 0:
+                continue
+                #print(this_candidate)
                 this_candidate[1] = grid.shape[1] + this_candidate[1]
                 new_realm[1] -= 1
 
             if this_candidate[0] >= grid.shape[0]:
+                #print(this_candidate)
+                continue
                 this_candidate[0] = this_candidate[0] - grid.shape[0]
                 new_realm[0] += 1
 
             if this_candidate[1] >= grid.shape[1]:
+                #print(this_candidate)
+                continue
                 this_candidate[1] = this_candidate[1] - grid.shape[1]
                 new_realm[1] += 1
 
             if grid[*this_candidate] == '.' or grid[*this_candidate] == 'S':
-                if (this_steps + 1) % 2 == 0:
+                if (this_steps + 1) % 2 == mod_check:
                     if (this_candidate[0], this_candidate[1], this_realm[0], new_realm[1]) not in garden_plots:
                         garden_plots.add((this_candidate[0], this_candidate[1], new_realm[0], new_realm[1]))
                         to_check.append([this_candidate, this_steps + 1, new_realm])
                 else:
                     to_check.append([this_candidate, this_steps + 1, new_realm])
 
-    return len(garden_plots)
+    return len(garden_plots), garden_plots
