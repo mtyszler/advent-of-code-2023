@@ -3,7 +3,7 @@ import collections as C
 
 G = C.defaultdict(set)
 
-for line in open('../input_files/input_day_25.txt'):
+for line in open('../input_files/input_day_25_example.txt'):
     u, *vs = line.replace(':','').split()
     for v in vs: G[u].add(v); G[v].add(u)
 

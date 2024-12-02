@@ -20,13 +20,14 @@ def test_steps_v3():
     n_garden = find_possibilities(grid, start_location, n_steps=10)
 
     assert (n_garden == 50)
-'''
+
 def test_steps_v4():
     grid, start_location = parse_input('../input_files/input_day_21_example.txt')
-    n_garden = find_possibilities(grid, start_location, n_steps=50)
+    n_garden, garden_plots = find_possibilities(grid, start_location, n_steps=50)
 
     assert (n_garden == 1594)
 
+'''
 @pytest.mark.parametrize("steps,  response",
                          [(6, 16),
                           (10, 50),

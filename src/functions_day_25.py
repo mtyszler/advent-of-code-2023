@@ -1,15 +1,20 @@
-def parse_input_file(input_file: str) -> set[frozenset]:
+def parse_input_file(input_file: str) -> dict:
     input_file = open(input_file, 'r')
     lines = input_file.readlines()
 
-    pairs = set()
+    connections = {}
     for this_line in lines:
         a, b = this_line.strip().split(": ")
         bb = b.split(" ")
+        if a not in connections.keys():
+            connections[a] = set()
         for x in bb:
-            pairs.add(frozenset([a,x]))
+            if x not in connections.keys():
+                connections[x] = set()
+            connections[a].add(x)
+            connections[x].add(a)
 
-    return pairs
+    return connections
 
 
 def find_intersections(pairs: set[frozenset]):

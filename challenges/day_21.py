@@ -10,6 +10,14 @@ n_garden, _ = find_possibilities(grid, start_location, n_steps=64)
 print(n_garden)
 
 print("challenge 2")
+grid, start_location = parse_input('../input_files/input_day_21_example.txt')
+distances = {}
+for r in range(grid.shape[0]):
+    for c in range(grid.shape[1]):
+        if (r,c) not in distances.keys():
+            new_distances = find_target(grid, start_location, target_location=[r,c], tentative_distances=distances)
+            distances.update(new_distances)
+
 grid, start_location = parse_input('../input_files/input_day_21.txt')
 
 for s, start_location in [
